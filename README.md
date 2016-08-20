@@ -1,3 +1,14 @@
+https://www.keithmcmillen.com/blog/making-music-in-the-browser-web-midi-api/
+
+
+
+
+
+
+
+
+
+
 electron-boilerplate
 ==============
 Minimalistic yet comprehensive boilerplate application for [Electron runtime](http://electron.atom.io).  
