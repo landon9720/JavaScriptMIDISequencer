@@ -1,12 +1,12 @@
 {
   "name": "electron-boilerplate",
-  "productName": "Electron Boilerplate",
-  "description": "Starter for your Electron application",
+  "productName": "ƒ",
+  "description": "JavaScript MIDI Sequencer",
   "version": "0.0.0",
-  "author": "Mr. Gumby <mr.gumby@example.com>",
-  "copyright": "© 2016, Gumby inc.",
+  "author": "Landon Kuhn <landon9720@gmail.com>",
+  "copyright": "© 2016, Landon Kuhn",
   "homepage": "http://example.com",
-  "license": "MIT",
+  "license": "",
   "main": "background.js",
   "dependencies": {
     "bootstrap": "^3.3.7",
