@@ -1,6 +1,3 @@
-// Here is the starting point for your application code.
-// All stuff below is just to show you how it works. You can delete all of it.
-
 // Use new ES6 modules syntax for everything.
 import os from 'os'; // native node.js module
 import { remote } from 'electron'; // native electron module
@@ -8,17 +5,52 @@ import jetpack from 'fs-jetpack'; // module loaded from npm
 import { greet } from './hello_world/hello_world'; // code authored by you in this project
 import env from './env';
 
-console.log('Loaded environment variables:', env);
-
 var app = remote.app;
 var appDir = jetpack.cwd(app.getAppPath());
 
-// Holy crap! This is browser window with HTML and stuff, but I can read
-// here files like it is node.js! Welcome to Electron world :)
-console.log('The author of this app is:', appDir.read('package.json', 'json').author);
+WebMidi.enable(function (e) {
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('greet').innerHTML = greet();
-    document.getElementById('platform-info').innerHTML = os.platform();
-    document.getElementById('env-name').innerHTML = env.name;
+  if (e) {
+    console.log(e);
+    return;
+  }
+
+  const input = WebMidi.inputs[0];
+  const output = WebMidi.outputs[0];
+  const output_channel = 1;
+
+  input.addListener('clock', undefined, function (e) {
+    try {
+      const messages = midi[pos];
+      _(messages).each(function (message) {
+        if (message.on) {
+          output.playNote(message.note, output_channel, { velocity: message.attack });
+        } else {
+          output.stopNote(message.note, output_channel, { velocity: message.release });
+        }
+      });
+    } catch (ex) {
+      console.log(`Failed sending MIDI message with exception: $ex`);
+    }
+    positionUpdate(pos);
+    pos++;
+  });
+  input.addListener('songposition', undefined, function (e) {
+    var v = data[0] | (data[1] << 8);
+    positionUpdate(v);
+    pos = v;
+  });
+  input.addListener('stop', undefined, function (e) {
+    positionUpdate(0);
+    pos = 0;
+  });
+
+  var midi = {};
+  var pos = 0;
+  const $pos = $('#pos');
+
+  function positionUpdate(p) {
+    $pos.text(p);
+  }
+
 });
