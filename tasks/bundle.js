@@ -3,6 +3,8 @@
 var path = require('path');
 var jetpack = require('fs-jetpack');
 var rollup = require('rollup').rollup;
+//import babel from 'rollup-plugin-babel';
+var babel = require('rollup-plugin-babel');
 
 var nodeBuiltInModules = ['assert', 'buffer', 'child_process', 'cluster',
     'console', 'constants', 'crypto', 'dgram', 'dns', 'domain', 'events',
@@ -28,22 +30,27 @@ module.exports = function (src, dest) {
         entry: src,
         external: generateExternalModulesList(),
         cache: cached[src],
+        plugins: [
+            babel({
+                exclude: 'node_modules/**'
+            })
+        ],
     })
-    .then(function (bundle) {
-        cached[src] = bundle;
+        .then(function (bundle) {
+            cached[src] = bundle;
 
-        var jsFile = path.basename(dest);
-        var result = bundle.generate({
-            format: 'cjs',
-            sourceMap: true,
-            sourceMapFile: jsFile,
+            var jsFile = path.basename(dest);
+            var result = bundle.generate({
+                format: 'cjs',
+                sourceMap: true,
+                sourceMapFile: jsFile,
+            });
+            // Wrap code in self invoking function so the variables don't
+            // pollute the global namespace.
+            var isolatedCode = '(function () {' + result.code + '\n}());';
+            return Promise.all([
+                jetpack.writeAsync(dest, isolatedCode + '\n//# sourceMappingURL=' + jsFile + '.map'),
+                jetpack.writeAsync(dest + '.map', result.map.toString()),
+            ]);
         });
-        // Wrap code in self invoking function so the variables don't
-        // pollute the global namespace.
-        var isolatedCode = '(function () {' + result.code + '\n}());';
-        return Promise.all([
-            jetpack.writeAsync(dest, isolatedCode + '\n//# sourceMappingURL=' + jsFile + '.map'),
-            jetpack.writeAsync(dest + '.map', result.map.toString()),
-        ]);
-    });
 };

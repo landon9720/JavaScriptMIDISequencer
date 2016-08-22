@@ -52,5 +52,6 @@ WebMidi.enable(function (e) {
   function positionUpdate(p) {
     $pos.text(p);
   }
-
 });
+
+import "./ƒ.js"

@@ -48,6 +48,7 @@
     "gulp-watch": "^4.3.5",
     "mocha": "^3.0.2",
     "rollup": "^0.34.7",
+    "rollup-plugin-babel": "^2.6.1",
     "source-map-support": "^0.4.2",
     "spectron": "^3.3.0",
     "yargs": "^4.2.0"
