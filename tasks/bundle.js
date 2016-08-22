@@ -3,7 +3,6 @@
 var path = require('path');
 var jetpack = require('fs-jetpack');
 var rollup = require('rollup').rollup;
-//import babel from 'rollup-plugin-babel';
 var babel = require('rollup-plugin-babel');
 
 var nodeBuiltInModules = ['assert', 'buffer', 'child_process', 'cluster',

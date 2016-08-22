@@ -1,7 +1,61 @@
+var Midi = {
+  onPositionUpdate: () => { },
+  midi: {}, // time -> midi message map
+  pos: 0
+};
+
+WebMidi.enable(function (e) {
+
+  if (e) {
+    console.log(e);
+    return;
+  }
+
+  const input = WebMidi.inputs[0];
+  const output = WebMidi.outputs[0];
+  const output_channel = 1;
+
+  input.addListener('clock', undefined, function (e) {
+    try {
+      const messages = Midi.midi[Midi.pos];
+      _(messages).each(function (message) {
+        if (message.on) {
+          output.playNote(message.note, output_channel, { velocity: message.attack });
+        } else {
+          output.stopNote(message.note, output_channel, { velocity: message.release });
+        }
+      });
+    } catch (ex) {
+      console.log(`Failed sending MIDI message with exception: ${ex}`);
+    }
+    Midi.onPositionUpdate(Midi.pos);
+    Midi.pos++;
+  });
+
+  input.addListener('songposition', undefined, function (e) {
+    var v = data[0] | (data[1] << 8);
+    Midi.onPositionUpdate(v);
+    Midi.pos = v;
+  });
+
+  input.addListener('stop', undefined, function (e) {
+    Midi.onPositionUpdate(0);
+    Midi.pos = 0;
+  });
+
+});
+
+export class Val {
+  constructor(val, negative = false) {
+    this.val = val;
+    this.negative = nevative;
+  }
+}
+
 var CommentBox = React.createClass({
-  handleCommentSubmit: function(comment) {
+  handleCommentSubmit: function (comment) {
     var comments = this.state.data;
-    this.setState({data: comments.concat(comment)});
+    this.setState({ data: comments.concat(comment) });
   },
   getInitialState: function () {
     return {
@@ -49,15 +103,15 @@ var CommentForm = React.createClass({
   handleTextChange: function (e) {
     this.setState({ text: e.target.value });
   },
-  handleSubmit: function(e) {
+  handleSubmit: function (e) {
     e.preventDefault();
     var author = this.state.author.trim();
     var text = this.state.text.trim();
     if (!text || !author) {
       return;
     }
-    this.props.onCommentSubmit({author: author, text: text});
-    this.setState({author: '', text: ''});
+    this.props.onCommentSubmit({ author: author, text: text });
+    this.setState({ author: '', text: '' });
   },
   render: function () {
     return (
@@ -93,7 +147,28 @@ var Comment = React.createClass({
   }
 });
 
+class Position extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      index: 0
+    };
+  }
+  render() {
+    return <span className="label label-default">{this.state.index}</span>;
+  }
+}
+
+class Matrix extends React.Component {
+  render() {
+    return <div>Hello, Matrix</div>;
+  }
+}
+
 ReactDOM.render(
-  <CommentBox />,
+  <div id="content">
+    <Position ref={positionComponent => Midi.onPositionUpdate = positionIndex => { positionComponent.setState({ index: positionIndex }); } }/>
+    <Matrix />
+  </div>,
   document.getElementById('ƒ')
 );
