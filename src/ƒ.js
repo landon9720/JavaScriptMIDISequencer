@@ -45,107 +45,15 @@ WebMidi.enable(function (e) {
 
 });
 
-export class Val {
-  constructor(val, negative = false) {
-    this.val = val;
-    this.negative = nevative;
-  }
-}
-
-var CommentBox = React.createClass({
-  handleCommentSubmit: function (comment) {
-    var comments = this.state.data;
-    this.setState({ data: comments.concat(comment) });
-  },
-  getInitialState: function () {
-    return {
-      data: [
-        { id: 1, author: "Pete Hxxxunt", text: "This is one comment" },
-        { id: 2, author: "Jordan Walke", text: "This is *another* comment" }
-      ]
-    };
-  },
-  render: function () {
-    return (
-      <div className="commentBox">
-        <h1>Comments</h1>
-        <CommentList data={this.state.data} />
-        <CommentForm onCommentSubmit={this.handleCommentSubmit} />
-      </div>
-    );
-  }
-});
-
-var CommentList = React.createClass({
-  render: function () {
-    var commentNodes = this.props.data.map(function (comment) {
-      return (
-        <Comment author={comment.author} key={comment.id}>
-          {comment.text}
-        </Comment>
-      );
-    });
-    return (
-      <div className="commentList">
-        {commentNodes}
-      </div>
-    );
-  }
-});
-
-var CommentForm = React.createClass({
-  getInitialState: function () {
-    return { author: '', text: '' };
-  },
-  handleAuthorChange: function (e) {
-    this.setState({ author: e.target.value });
-  },
-  handleTextChange: function (e) {
-    this.setState({ text: e.target.value });
-  },
-  handleSubmit: function (e) {
-    e.preventDefault();
-    var author = this.state.author.trim();
-    var text = this.state.text.trim();
-    if (!text || !author) {
-      return;
+function closest(el, selector) {
+  while (el) {
+    if (el.matches.call(el, selector)) {
+      break;
     }
-    this.props.onCommentSubmit({ author: author, text: text });
-    this.setState({ author: '', text: '' });
-  },
-  render: function () {
-    return (
-      <form className="commentForm" onSubmit={this.handleSubmit}>
-        <input
-          type="text"
-          placeholder="Your name"
-          value={this.state.author}
-          onChange={this.handleAuthorChange}
-          />
-        <input
-          type="text"
-          placeholder="Say something..."
-          value={this.state.text}
-          onChange={this.handleTextChange}
-          />
-        <input type="submit" value="Post" />
-      </form>
-    );
+    el = el.parentElement;
   }
-});
-
-var Comment = React.createClass({
-  render: function () {
-    return (
-      <div className="comment">
-        <h2 className="commentAuthor">
-          {this.props.author}
-        </h2>
-        {this.props.children}
-      </div>
-    );
-  }
-});
+  return el;
+}
 
 class Position extends React.Component {
   constructor() {
@@ -159,16 +67,150 @@ class Position extends React.Component {
   }
 }
 
-class Matrix extends React.Component {
+class Value extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: ' ',
+      negative: false
+    };
+  }
+  onMouseDown(e) {
+    this.props.mouseDown(this.props.colIndex);
+  }
   render() {
-    return <div>Hello, Matrix</div>;
+    return (
+      <div className={'rowValue ' + (this.props.activeCol ? 'activeCol' : '') } onMouseDown={this.onMouseDown.bind(this)} />
+    );
   }
 }
 
-ReactDOM.render(
-  <div id="content">
+class Row extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  onKeyDown(e) {
+    // console.log("Row onKeyDown", e);
+    switch (e.key) {
+      case 'ArrowUp':
+        var p = this.refs.el.previousSibling;
+        if (!p) {
+          const pMatrix = closest(this.refs.el, '.matrix').previousSibling;
+          if (pMatrix) {
+            const pMatrixRows = pMatrix.querySelectorAll('.matrixRow');
+            if (pMatrixRows.length > 0) {
+              p = pMatrixRows[pMatrixRows.length - 1];
+            }
+          }
+        }
+        if (p) {
+          p.focus();
+          e.preventDefault();
+        }
+        break;
+      case 'ArrowDown':
+        var p = this.refs.el.nextSibling;
+        if (!p) {
+          const pMatrix = closest(this.refs.el, '.matrix').nextSibling;
+          if (pMatrix) {
+            const pMatrixRows = pMatrix.querySelectorAll('.matrixRow');
+            if (pMatrixRows.length > 0) {
+              p = pMatrixRows[0];
+            }
+          }
+        }
+        if (p) {
+          p.focus();
+          e.preventDefault();
+        }
+        break;
+      case 'ArrowLeft':
+        this.props.left();
+        break;
+      case 'ArrowRight':
+        this.props.right();
+        break;
+    }
+  }
+  render() {
+    const rowValues = [...Array(40).keys()].map(i =>
+      <Value key={i} colIndex={i} activeCol={i == this.props.activeCol} mouseDown={this.props.mouseDown} />
+    );
+    return (
+      <div className="matrixRow" ref="el" tabIndex="0" onKeyDown={this.onKeyDown.bind(this) }>
+        <div className="matrixRowName">{this.props.name}</div>
+        <div className="matrixRowValues">{rowValues}</div>
+      </div>
+    );
+  }
+}
+
+class Matrix extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    const rows = this.props.rows.map(row =>
+      <Row key={row} name={row} activeCol={this.props.activeColumnIndex} left={this.props.left} right={this.props.right} mouseDown={this.props.mouseDown} />
+    );
+    return (
+      <div className="matrix">
+        <div className="matrixHeading">{this.props.name}</div>
+        <div className="matrixRowArea">{rows}</div>
+      </div>
+    );
+  }
+}
+
+class Content extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeColumnIndex: 0,
+      matrixes: props.matrixes
+    };
+  }
+  onLeft() {
+    this.setState({
+      activeColumnIndex: this.state.activeColumnIndex - 1
+    });
+  }
+  onRight() {
+    this.setState({
+      activeColumnIndex: this.state.activeColumnIndex + 1
+    });
+  }
+  mouseDown(i) {
+    this.setState({
+      activeColumnIndex: i
+    });
+  }
+  render() {
+    const matrixesWithEvents = this.state.matrixes.map(i => {
+      return React.cloneElement(i, {
+        left: this.onLeft.bind(this),
+        right: this.onRight.bind(this),
+        mouseDown: this.mouseDown.bind(this),
+        activeColumnIndex: this.state.activeColumnIndex,
+      });
+    });
+    return (
+      <div id="content">{matrixesWithEvents}{this.props.children}</div>
+    );
+  }
+}
+
+var matrixes = [
+  <Matrix key="scale" name="scale" rows={['value']} />,
+  <Matrix key="chord" name="chord" rows={['value']} />,
+  <Matrix key="values" name="values" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="values_of_scale" name="values_of_scale" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="values_of_chord" name="values_of_chord" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+];
+
+const content = ReactDOM.render(
+  <Content matrixes={matrixes}>
     <Position ref={positionComponent => Midi.onPositionUpdate = positionIndex => { positionComponent.setState({ index: positionIndex }); } }/>
-    <Matrix />
-  </div>,
+  </Content>,
   document.getElementById('ƒ')
 );

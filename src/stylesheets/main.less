@@ -1,0 +1,38 @@
+@c: gray;
+@bg: darkgray;
+
+body {
+    background-color: @c;
+    -webkit-user-select: none;
+    cursor: pointer;
+}
+
+.matrix {
+    :focus {
+        outline: 0;
+    }
+    .matrixRow:focus {
+        background-color: darken(@bg, 5%);
+    }
+    .matrixRow {
+        display: flex;
+        background-color: @bg;
+        &:focus .rowValue.activeCol {
+            background-color: lighten(@c, 50%);
+        }
+        .rowValue.activeCol {
+            background-color: darken(@bg, 5%);
+        }
+        .matrixRowName {
+            flex-basis: 20%;
+        }
+        .matrixRowValues {
+            display: flex;
+            flex-basis: 80%;
+            .rowValue {
+                flex-basis: 10px;
+                flex-grow: 1;
+            }
+        }
+    }
+}
