@@ -55,15 +55,36 @@ function closest(el, selector) {
   return el;
 }
 
-class Position extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      index: 0
-    };
-  }
-  render() {
-    return <span className="label label-default">{this.state.index}</span>;
+const Position = ({ currentPositionIndex }) => {
+  return <span className="label label-default">{currentPositionIndex}</span>;
+}
+
+const mapStateToProps = (state) => {
+  return {
+    currentPositionIndex: state.currentPositionIndex
+  };
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {};
+}
+
+import { connect } from 'react-redux'
+
+const PositionContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Position);
+
+const ƒApp = (state = { currentPositionIndex: 0 }, action) => {
+  switch (action.type) {
+    case "set":
+      return {
+        currentPositionIndex: action.newPositionIndex
+      };
+    default:
+      console.log("state", state, "action", action);
+      return state;
   }
 }
 
@@ -145,22 +166,16 @@ class Row extends React.Component {
   }
 }
 
-class Matrix extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    const rows = this.props.rows.map(row =>
-      <Row key={row} name={row} activeCol={this.props.activeColumnIndex} left={this.props.left} right={this.props.right} mouseDown={this.props.mouseDown} />
-    );
-    return (
-      <div className="matrix">
-        <div className="matrixHeading">{this.props.name}</div>
-        <div className="matrixRowArea">{rows}</div>
-      </div>
-    );
-  }
-}
+var Matrix = ({ name, rows, activeColumnIndex, left, right, mouseDown }) => {
+  return (
+    <div className="matrix">
+      <div className="matrixHeading">{name}</div>
+      <div className="matrixRowArea">{rows.map(row =>
+        <Row key={row} name={row} activeCol={activeColumnIndex} left={left} right={right} mouseDown={mouseDown} />
+      )}</div>
+    </div>
+  );
+};
 
 class Content extends React.Component {
   constructor(props) {
@@ -208,9 +223,24 @@ var matrixes = [
   <Matrix key="values_of_chord" name="values_of_chord" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
 ];
 
+import React from 'react'
+import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+
+const store = createStore(ƒApp)
+
+Midi.onPositionUpdate = positionIndex => { 
+  store.dispatch({ type: 'set', newPositionIndex: positionIndex }); 
+};
+
+var ReactDOM = require('react-dom');
+
 const content = ReactDOM.render(
-  <Content matrixes={matrixes}>
-    <Position ref={positionComponent => Midi.onPositionUpdate = positionIndex => { positionComponent.setState({ index: positionIndex }); } }/>
-  </Content>,
+  <Provider store={store}>
+    <Content matrixes={matrixes}>
+      <PositionContainer />
+    </Content>
+  </Provider>,
   document.getElementById('ƒ')
 );
