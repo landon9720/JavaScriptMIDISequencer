@@ -17,14 +17,13 @@ body {
     .matrixRow {
         display: flex;
         background-color: @bg;
-        &:focus .rowValue.activeCol {
+        &:focus .activeCol {
             background-color: lighten(@c, 50%);
-        }
-        .rowValue.activeCol {
-            background-color: darken(@bg, 5%);
         }
         .matrixRowName {
             flex-basis: 20%;
+            background-color: darken(@bg, 50%);
+            color: @bg;
         }
         .matrixRowValues {
             display: flex;
@@ -32,6 +31,7 @@ body {
             .rowValue {
                 flex-basis: 10px;
                 flex-grow: 1;
+                margin: 1px;
             }
         }
     }

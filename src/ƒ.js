@@ -16,7 +16,7 @@ WebMidi.enable(function (e) {
   const output_channel = 1;
 
   input.addListener('clock', undefined, function (e) {
-    try {
+    // try {
       const messages = Midi.midi[Midi.pos];
       _(messages).each(function (message) {
         if (message.on) {
@@ -25,15 +25,15 @@ WebMidi.enable(function (e) {
           output.stopNote(message.note, output_channel, { velocity: message.release });
         }
       });
-    } catch (ex) {
-      console.log(`Failed sending MIDI message with exception: ${ex}`);
-    }
+    // } catch (ex) {
+      // console.log(`Failed sending MIDI message with exception: ${ex}`);
+    // }
     Midi.onPositionUpdate(Midi.pos);
     Midi.pos++;
   });
 
   input.addListener('songposition', undefined, function (e) {
-    var v = data[0] | (data[1] << 8);
+    var v = e.data[0] | (e.data[1] << 8);
     Midi.onPositionUpdate(v);
     Midi.pos = v;
   });
@@ -76,42 +76,68 @@ const PositionContainer = connect(
   mapDispatchToProps
 )(Position);
 
-const ƒApp = (state = { currentPositionIndex: 0 }, action) => {
+const ƒApp = (state = { currentPositionIndex: 0, activeColIndex: 0 }, action) => {
   switch (action.type) {
-    case "set":
-      return {
+    case "setPositionIndex":
+      return Object.assign({}, state, {
         currentPositionIndex: action.newPositionIndex
-      };
+      });
+    case "setActiveColIndex":
+      return Object.assign({}, state, {
+        activeColIndex: action.newActiveColIndex
+      });
+    case "incrActiveColIndex":
+      return Object.assign({}, state, {
+        activeColIndex: state.activeColIndex + 1
+      });
+    case "decrActiveColIndex":
+      return Object.assign({}, state, {
+        activeColIndex: state.activeColIndex - 1
+      });
     default:
-      console.log("state", state, "action", action);
       return state;
   }
 }
 
+const notActive = 'rowValue'
+const active = 'rowValue activeCol'
+
 class Value extends React.Component {
   constructor(props) {
-    super(props);
-    this.state = {
-      value: ' ',
-      negative: false
-    };
+    super(props)
+    this.onMouseDown = this.onMouseDown.bind(this)
+    this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this)
   }
-  onMouseDown(e) {
-    this.props.mouseDown(this.props.colIndex);
+  onMouseDown() {
+    this.props.click(this.props.colIndex);
   }
   render() {
+    var className = 
+      (this.props.rowHasFocus && this.props.colIndex == this.props.activeCol) ?
+      active : notActive 
     return (
-      <div className={'rowValue ' + (this.props.activeCol ? 'activeCol' : '') } onMouseDown={this.onMouseDown.bind(this)} />
+      <div className={className} onMouseDown={this.onMouseDown} />
     );
   }
 }
 
+const ValueContainer = connect(
+  state => { return { 
+    activeCol: state.activeColIndex,
+  }},
+  dispatch => { return {
+    click: (colIndex) => { dispatch({ type: 'setActiveColIndex', newActiveColIndex: colIndex })  }
+  }}
+)(Value)
+
 class Row extends React.Component {
   constructor(props) {
     super(props);
+    this.onKeyDown = this.onKeyDown.bind(this)
+    this.hasFocus = this.hasFocus.bind(this)
+    this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this) // no
   }
   onKeyDown(e) {
-    // console.log("Row onKeyDown", e);
     switch (e.key) {
       case 'ArrowUp':
         var p = this.refs.el.previousSibling;
@@ -153,12 +179,15 @@ class Row extends React.Component {
         break;
     }
   }
+  hasFocus() {
+    return this.el === document.activeElement;
+  }
   render() {
-    const rowValues = [...Array(40).keys()].map(i =>
-      <Value key={i} colIndex={i} activeCol={i == this.props.activeCol} mouseDown={this.props.mouseDown} />
+    const rowValues = [...Array(24).keys()].map(i =>
+      <ValueContainer key={i} colIndex={i} rowHasFocus={this.hasFocus} />
     );
     return (
-      <div className="matrixRow" ref="el" tabIndex="0" onKeyDown={this.onKeyDown.bind(this) }>
+      <div className="matrixRow" ref="el" tabIndex="0" onKeyDown={this.onKeyDown}>
         <div className="matrixRowName">{this.props.name}</div>
         <div className="matrixRowValues">{rowValues}</div>
       </div>
@@ -166,12 +195,20 @@ class Row extends React.Component {
   }
 }
 
-var Matrix = ({ name, rows, activeColumnIndex, left, right, mouseDown }) => {
+const RowContainer = connect(
+  state => { return {} },
+  dispatch => { return {
+    left: () => dispatch({'type': 'decrActiveColIndex'}),
+    right: () => dispatch({'type': 'incrActiveColIndex'})
+  }}
+)(Row)
+
+var Matrix = ({ name, rows }) => {
   return (
     <div className="matrix">
       <div className="matrixHeading">{name}</div>
       <div className="matrixRowArea">{rows.map(row =>
-        <Row key={row} name={row} activeCol={activeColumnIndex} left={left} right={right} mouseDown={mouseDown} />
+        <RowContainer key={row} name={row} />
       )}</div>
     </div>
   );
@@ -180,58 +217,46 @@ var Matrix = ({ name, rows, activeColumnIndex, left, right, mouseDown }) => {
 class Content extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      activeColumnIndex: 0,
-      matrixes: props.matrixes
-    };
-  }
-  onLeft() {
-    this.setState({
-      activeColumnIndex: this.state.activeColumnIndex - 1
-    });
-  }
-  onRight() {
-    this.setState({
-      activeColumnIndex: this.state.activeColumnIndex + 1
-    });
-  }
-  mouseDown(i) {
-    this.setState({
-      activeColumnIndex: i
-    });
+    this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
   }
   render() {
-    const matrixesWithEvents = this.state.matrixes.map(i => {
-      return React.cloneElement(i, {
-        left: this.onLeft.bind(this),
-        right: this.onRight.bind(this),
-        mouseDown: this.mouseDown.bind(this),
-        activeColumnIndex: this.state.activeColumnIndex,
-      });
-    });
-    return (
-      <div id="content">{matrixesWithEvents}{this.props.children}</div>
-    );
+    return <div id="content">{this.props.matrixes}{this.props.children}</div>
   }
 }
 
 var matrixes = [
-  <Matrix key="scale" name="scale" rows={['value']} />,
-  <Matrix key="chord" name="chord" rows={['value']} />,
-  <Matrix key="values" name="values" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
-  <Matrix key="values_of_scale" name="values_of_scale" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
-  <Matrix key="values_of_chord" name="values_of_chord" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="0scale" name="scale" rows={['value']} />,
+  <Matrix key="0chord" name="chord" rows={['value']} />,
+  <Matrix key="0values" name="values" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="0values_of_scale" name="values_of_scale" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="0values_of_chord" name="values_of_chord" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="1scale" name="scale" rows={['value']} />,
+  <Matrix key="1chord" name="chord" rows={['value']} />,
+  <Matrix key="1values" name="values" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="1values_of_scale" name="values_of_scale" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="1values_of_chord" name="values_of_chord" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="2scale" name="scale" rows={['value']} />,
+  <Matrix key="2chord" name="chord" rows={['value']} />,
+  <Matrix key="2values" name="values" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="2values_of_scale" name="values_of_scale" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="2values_of_chord" name="values_of_chord" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="3scale" name="scale" rows={['value']} />,
+  <Matrix key="3chord" name="chord" rows={['value']} />,
+  <Matrix key="3values" name="values" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="3values_of_scale" name="values_of_scale" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
+  <Matrix key="3values_of_chord" name="values_of_chord" rows={['duration', 'value', 'octave', 'accidental', 'attack', 'release']} />,
 ];
 
 import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 const store = createStore(ƒApp)
 
 Midi.onPositionUpdate = positionIndex => { 
-  store.dispatch({ type: 'set', newPositionIndex: positionIndex }); 
+  store.dispatch({ type: 'setPositionIndex', newPositionIndex: positionIndex }); 
 };
 
 var ReactDOM = require('react-dom');
