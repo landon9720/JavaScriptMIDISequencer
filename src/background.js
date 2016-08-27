@@ -37,7 +37,7 @@ app.on('ready', function () {
         width: 1000,
         height: 600,
         webPreferences: {
-            zoomFactor: 1.4,
+            zoomFactor: 2.0,
         },
     });
 
