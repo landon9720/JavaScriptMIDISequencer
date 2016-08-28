@@ -18,7 +18,8 @@ WebMidi.enable(function (e) {
   const output_channel = 1;
 
   input.addListener('clock', undefined, function (e) {
-    // try {
+    Midi.pos++
+    try {
       const messages = Midi.midi[Midi.pos];
       _(messages).each(function (message) {
         if (message.on) {
@@ -26,12 +27,11 @@ WebMidi.enable(function (e) {
         } else {
           output.stopNote(message.note, output_channel, { velocity: message.release });
         }
-      });
-    // } catch (ex) {
-      // console.log(`Failed sending MIDI message with exception: ${ex}`);
-    // }
-    Midi.onPositionUpdate(Midi.pos);
-    Midi.pos++;
+      })
+    } catch (ex) {
+      console.log(`Failed sending MIDI message with exception: ${ex}`);
+    }
+    Midi.onPositionUpdate(Midi.pos)
   });
 
   input.addListener('songposition', undefined, function (e) {
