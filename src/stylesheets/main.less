@@ -1,6 +1,6 @@
 @c: gray;
 @bg: darkgray;
-
+@transport: rgba(255, 0, 0, .4);
 body {
     background-color: @c;
     -webkit-user-select: none;
@@ -8,22 +8,40 @@ body {
 }
 
 .matrix {
-    :focus {
-        outline: 0;
-    }
-    .matrixRow:focus {
-        background-color: darken(@bg, 5%);
+    .matrixHeading {
+        display: flex;
+        .matrixName {
+            flex-basis: 20%;
+        }
+        .matrixTimeSeries {
+            display: flex;
+            flex-basis: 80%;
+            .value {
+                flex-basis: 10px;
+                flex-grow: 1;
+                margin: 1px;
+                &.active {
+                    background-color: @transport;
+                }
+            }
+        }
     }
     .matrixRow {
         display: flex;
         background-color: @bg;
+        &:focus {
+            outline: 0;
+            background-color: darken(@bg, 5%);
+        }
         &:focus .activeCol {
             background-color: lighten(@c, 50%);
         }
         .matrixRowName {
             flex-basis: 20%;
             background-color: darken(@bg, 50%);
-            color: @bg;
+            color: darken(@bg, 10%);
+            text-shadow: -1px 1px 8px darken(@bg, 20%), 1px -1px 8px darken(@bg, 20%);
+            text-align: center;
         }
         .matrixRowValues {
             display: flex;

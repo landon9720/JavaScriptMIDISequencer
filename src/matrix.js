@@ -12,9 +12,18 @@ class Matrix extends React.Component {
     this.props.setActiveRow(this.props.matrix.name, rowName)
   }
   render() {
+    const values = [...Array(24).keys()].map(i => {
+      const className = 
+        i == this.props.currentPositionIndex ?
+        'value active' : 'value'
+      return <div className={className}></div>
+    })
     return (
       <div className="matrix">
-        <div className="matrixHeading">{this.props.matrixName}</div>
+        <div className="matrixHeading">
+          <div className="matrixName">{this.props.matrixName}</div>
+          <div className="matrixTimeSeries">{values}</div>
+        </div>
         <div className="matrixRowArea">{Object.keys(this.props.matrix.rows).map(rowName =>
           <Row key={rowName} rowName={rowName} row={this.props.matrix.rows[rowName]} onFocus={this.onFocus} />
         )}</div>
@@ -24,6 +33,6 @@ class Matrix extends React.Component {
 }
 
 export default connect(
-  state => { return { } },
+  state => { return { currentPositionIndex: state.currentPositionIndex } },
   dispatch => { return { setActiveRow: (matrixName, rowName) => dispatch({ type: 'setActiveRow', path: [matrixName, rowName] }) } }
 )(Matrix)
