@@ -12,8 +12,8 @@ class Row extends React.Component {
     this.onFocus = this.onFocus.bind(this)
   }
   onKeyDown(e) {
-    switch (e.key) {
-      case 'ArrowUp':
+    switch (true) {
+      case (e.key === 'ArrowUp'):
         var p = this.refs.el.previousSibling;
         if (!p) {
           const pMatrix = closest(this.refs.el, '.matrix').previousSibling;
@@ -29,7 +29,7 @@ class Row extends React.Component {
           e.preventDefault();
         }
         break;
-      case 'ArrowDown':
+      case (e.key === 'ArrowDown'):
         var p = this.refs.el.nextSibling;
         if (!p) {
           const pMatrix = closest(this.refs.el, '.matrix').nextSibling;
@@ -44,13 +44,30 @@ class Row extends React.Component {
           p.focus();
           e.preventDefault();
         }
-        break;
-      case 'ArrowLeft':
-        this.props.left();
-        break;
-      case 'ArrowRight':
-        this.props.right();
-        break;
+        break
+      case (e.key === 'ArrowLeft'):
+        this.props.left()
+        break
+      case (e.key === 'ArrowRight'):
+        this.props.right()
+        break
+      case ((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 65 && e.keyCode <= 90)):
+        const value = e.keyCode >= 65 ? e.keyCode - 55 : e.keyCode - 48
+        this.props.onSetValue(this.props.rowName, value)
+        this.props.right()
+        break
+      case (e.keyCode == 32):
+        this.props.onSetValue(this.props.rowName, undefined)
+        this.props.right()
+        break
+      case (e.keyCode == 8):
+        if (this.props.activeColIndex > 0) {
+          this.props.left()
+          this.props.onSetValue(this.props.rowName, undefined)
+        }
+        break
+      default:
+        console.log(`key? key='${e.key}' keyCode=${e.keyCode}`)
     }
   }
   hasFocus() {
@@ -60,9 +77,11 @@ class Row extends React.Component {
     this.props.onFocus(this.props.name)
   }
   render() {
-    const rowValues = [...Array(24).keys()].map(i =>
-      <Value key={i} colIndex={i} rowHasFocus={this.hasFocus} />
-    )
+    const rowValues = [...Array(24).keys()].map(i => {
+      var v = this.props.row.get(i)
+      if (v !== undefined) v = v.toString(36)
+      return <Value key={i} colIndex={i} rowHasFocus={this.hasFocus} value={v} />
+    })
     return (
       <div className="matrixRow" ref="el" tabIndex="0" onKeyDown={this.onKeyDown} onFocus={this.onFocus}>
         <div className="matrixRowName">{this.props.rowName}</div>
@@ -73,7 +92,9 @@ class Row extends React.Component {
 }
 
 export default connect(
-  state => { return { } },
+  state => { return { 
+    activeColIndex: state.activeColIndex 
+  }},
   dispatch => { return {
     left: () => dispatch({'type': 'decrActiveColIndex'}),
     right: () => dispatch({'type': 'incrActiveColIndex'})

@@ -15,8 +15,10 @@ class Value extends React.Component {
   render() {
     return (
       <div 
-      className={(this.props.rowHasFocus && this.props.colIndex == this.props.activeCol) ? active : notActive} 
-      onMouseDown={this.onMouseDown} />
+        className={(this.props.rowHasFocus && this.props.colIndex == this.props.activeCol) ? active : notActive} 
+        onMouseDown={this.onMouseDown}>
+        {this.props.value === undefined ? "" : this.props.value}
+      </div>
     )
   }
 }
