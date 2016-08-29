@@ -52,9 +52,12 @@ class Row extends React.Component {
         this.props.right()
         break
       case ((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 65 && e.keyCode <= 90)):
-        const value = e.keyCode >= 65 ? e.keyCode - 55 : e.keyCode - 48
-        this.props.onSetValue(this.props.rowName, value)
-        this.props.right()
+        if (!e.altKey && !e.ctrlKey && !e.metaKey) {
+          var value = e.keyCode >= 65 ? e.keyCode - 55 : e.keyCode - 48
+          if (e.shiftKey) value *= -1
+          this.props.onSetValue(this.props.rowName, value)
+          this.props.right()
+        }
         break
       case (e.keyCode == 32):
         this.props.onSetValue(this.props.rowName, undefined)
@@ -75,7 +78,7 @@ class Row extends React.Component {
   }
   onFocus() {
     this.props.onFocus(this.props.name)
-  }
+  } 
   render() {
     const rowValues = [...Array(24).keys()].map(i => {
       var v = this.props.row.get(i)

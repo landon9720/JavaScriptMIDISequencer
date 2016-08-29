@@ -10,6 +10,7 @@ const defaultState = {
   activeMatrix: null,
   activeRow: null,
   activeColIndex: 0,
+  insertCursorMode: false,
   matrixes: Immutable.OrderedMap({})
 }
 
@@ -30,6 +31,10 @@ const stateMachine = (state = defaultState, action) => {
     case "decrActiveColIndex":
       return Object.assign({}, state, {
         activeColIndex: Math.max(state.activeColIndex - 1, 0)
+      })
+    case "setInsertCursorMode":
+      return Object.assign({}, state, {
+        insertCursorMode: action.b
       })
     case "setActiveRow":
       var [matrixName, rowName] = action.path
@@ -56,12 +61,19 @@ const loadedState = {
   activeMatrix: null,
   activeRow: null,
   activeColIndex: 0,
+  insertCursorMode: false,
   matrixes: Immutable.OrderedMap({
     scale: Immutable.OrderedMap({
       rows: Immutable.OrderedMap({
         value: Immutable.Map()
       })
-    })
+    }),
+    notes_of_scale: Immutable.OrderedMap({
+      rows: Immutable.OrderedMap({
+        duration: Immutable.Map(),
+        value: Immutable.Map()
+      })
+    }),
   })
 }
 
@@ -70,6 +82,8 @@ export default createStore(
   loadedState, 
   applyMiddleware(thunk, promise, createLogger({ 
     collapsed: true,
-    stateTransformer: state => Object.assign({}, state, { matrixes: state.matrixes.toString() })
+    stateTransformer: state => Object.assign({}, state, { 
+      matrixes: state.matrixes.toJS() 
+    })
   }))
 )

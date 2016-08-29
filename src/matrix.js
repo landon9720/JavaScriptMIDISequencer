@@ -7,7 +7,7 @@ class Matrix extends React.Component {
   constructor(props) {
     super(props)
     this.onFocus = this.onFocus.bind(this)
-    this.onSetValue = this.onSetValue.bind(this)
+    this.onSetValue = this.onSetValue.bind(this)    
   }
   onFocus(rowName) {
     this.props.setActiveRow(this.props.matrix.name, rowName)
@@ -20,11 +20,11 @@ class Matrix extends React.Component {
       const className =
         i == this.props.currentPositionIndex ?
           'value active' : 'value'
-      return <div className={className}></div>
+      return <div key={i} className={className}></div>
     })
     const rows = this.props.matrix.get('rows').map((row, rowName) =>
       <Row key={rowName} rowName={rowName} row={row} onFocus={this.onFocus} onSetValue={this.onSetValue} />
-    )
+    ).valueSeq()
     return (
       <div className="matrix">
         <div className="matrixHeading">
