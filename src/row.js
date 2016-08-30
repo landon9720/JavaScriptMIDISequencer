@@ -77,7 +77,7 @@ class Row extends React.Component {
     return this.el === document.activeElement;
   }
   onFocus() {
-    this.props.onFocus(this.props.name)
+    this.props.onFocus(this.props.rowName)
   } 
   render() {
     const rowValues = [...Array(24).keys()].map(i => {

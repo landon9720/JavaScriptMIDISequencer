@@ -10,7 +10,7 @@ const defaultState = {
   activeMatrix: null,
   activeRow: null,
   activeColIndex: 0,
-  insertCursorMode: false,
+  cursorMode: 0,
   matrixes: Immutable.OrderedMap({})
 }
 
@@ -32,9 +32,9 @@ const stateMachine = (state = defaultState, action) => {
       return Object.assign({}, state, {
         activeColIndex: Math.max(state.activeColIndex - 1, 0)
       })
-    case "setInsertCursorMode":
+    case "setCursorMode":
       return Object.assign({}, state, {
-        insertCursorMode: action.b
+        cursorMode: action.value
       })
     case "setActiveRow":
       return (function () {
@@ -52,11 +52,13 @@ const stateMachine = (state = defaultState, action) => {
         const value = action.path[2]
         const novalue = value === undefined
         var matrix = state.matrixes.get(matrixName)
-        if (state.insertCursorMode) {
-          let shiftedRows = matrix.get('rows').mapEntries(([rowName, row]) => {
-            return [rowName, row.mapEntries(([t, value]) => {
-              if (t < state.activeColIndex) return [t, value]
-              else return [t + 1, value]
+        if (state.cursorMode > 0) {
+          let shiftedRows = matrix.get('rows').mapEntries(([rn, row]) => {
+            return [rn, row.mapEntries(([t, value]) => {
+              if (t < state.activeColIndex || (state.cursorMode == 1 && rn != rowName))
+                return [t, value]
+              else
+                return [t + 1, value]
             })]
           })
           matrix = matrix.set('rows', shiftedRows)
@@ -72,11 +74,13 @@ const stateMachine = (state = defaultState, action) => {
         const rowName = action.path[1]
         var matrix = state.matrixes.get(matrixName)
         matrix = matrix.deleteIn(["rows", rowName, state.activeColIndex - 1])
-        if (state.insertCursorMode) {
-          let shiftedRows = matrix.get('rows').mapEntries(([rowName, row]) => {
-            return [rowName, row.mapEntries(([t, value]) => {
-              if (t < state.activeColIndex) return [t, value]
-              else return [t - 1, value]
+        if (state.cursorMode > 0) {
+          let shiftedRows = matrix.get('rows').mapEntries(([rn, row]) => {
+            return [rn, row.mapEntries(([t, value]) => {
+              if (t < state.activeColIndex || (state.cursorMode == 1 && rn != rowName))
+                return [t, value]
+              else
+                return [t - 1, value]
             })]
           })
           matrix = matrix.set('rows', shiftedRows)
@@ -95,7 +99,7 @@ const loadedState = {
   activeMatrix: null,
   activeRow: null,
   activeColIndex: 0,
-  insertCursorMode: false,
+  cursorMode: 0,
   matrixes: Immutable.OrderedMap({
     scale: Immutable.OrderedMap({
       rows: Immutable.OrderedMap({
