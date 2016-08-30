@@ -37,20 +37,54 @@ const stateMachine = (state = defaultState, action) => {
         insertCursorMode: action.b
       })
     case "setActiveRow":
-      var [matrixName, rowName] = action.path
-      return Object.assign({}, state, {
-        activeMatrix: matrixName,
-        activeRow: rowName
-      })
-    case "setValue":
-      var [matrixName, rowName, value] = action.path
-      const x = state.activeColIndex
-      const updated = value !== undefined ? 
-        state.matrixes.setIn([matrixName, "rows", rowName, x], value) :
-        state.matrixes.deleteIn([matrixName, "rows", rowName, x])
-      return Object.assign({}, state, {
-        matrixes: updated
-      })
+      return (function () {
+        const matrixName = action.path[0]
+        const rowName = action.path[1]
+        return Object.assign({}, state, {
+          activeMatrix: matrixName,
+          activeRow: rowName
+        })
+      })()
+    case "inputValue":
+      return (function () {
+        const matrixName = action.path[0]
+        const rowName = action.path[1]
+        const value = action.path[2]
+        const novalue = value === undefined
+        var matrix = state.matrixes.get(matrixName)
+        if (state.insertCursorMode) {
+          let shiftedRows = matrix.get('rows').mapEntries(([rowName, row]) => {
+            return [rowName, row.mapEntries(([t, value]) => {
+              if (t < state.activeColIndex) return [t, value]
+              else return [t + 1, value]
+            })]
+          })
+          matrix = matrix.set('rows', shiftedRows)
+        }
+        matrix = matrix.setIn(["rows", rowName, state.activeColIndex], value)
+        return Object.assign({}, state, {
+          matrixes: state.matrixes.set(matrixName, matrix)
+        })
+      })()
+    case "backspaceValue":
+      return (function () {
+        const matrixName = action.path[0]
+        const rowName = action.path[1]
+        var matrix = state.matrixes.get(matrixName)
+        matrix = matrix.deleteIn(["rows", rowName, state.activeColIndex - 1])
+        if (state.insertCursorMode) {
+          let shiftedRows = matrix.get('rows').mapEntries(([rowName, row]) => {
+            return [rowName, row.mapEntries(([t, value]) => {
+              if (t < state.activeColIndex) return [t, value]
+              else return [t - 1, value]
+            })]
+          })
+          matrix = matrix.set('rows', shiftedRows)
+        }
+        return Object.assign({}, state, {
+          matrixes: state.matrixes.set(matrixName, matrix)
+        })
+      })()
     default:
       return state
   }
@@ -78,12 +112,12 @@ const loadedState = {
 }
 
 export default createStore(
-  stateMachine, 
-  loadedState, 
-  applyMiddleware(thunk, promise, createLogger({ 
+  stateMachine,
+  loadedState,
+  applyMiddleware(thunk, promise, createLogger({
     collapsed: true,
-    stateTransformer: state => Object.assign({}, state, { 
-      matrixes: state.matrixes.toJS() 
+    stateTransformer: state => Object.assign({}, state, {
+      matrixes: state.matrixes.toJS()
     })
   }))
 )

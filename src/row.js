@@ -55,18 +55,18 @@ class Row extends React.Component {
         if (!e.altKey && !e.ctrlKey && !e.metaKey) {
           var value = e.keyCode >= 65 ? e.keyCode - 55 : e.keyCode - 48
           if (e.shiftKey) value *= -1
-          this.props.onSetValue(this.props.rowName, value)
+          this.props.onInputValue(this.props.rowName, value)
           this.props.right()
         }
         break
       case (e.keyCode == 32):
-        this.props.onSetValue(this.props.rowName, undefined)
+        this.props.onInputValue(this.props.rowName, undefined)
         this.props.right()
         break
       case (e.keyCode == 8):
         if (this.props.activeColIndex > 0) {
+          this.props.onBackspaceValue(this.props.rowName)
           this.props.left()
-          this.props.onSetValue(this.props.rowName, undefined)
         }
         break
       default:

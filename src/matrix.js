@@ -7,13 +7,17 @@ class Matrix extends React.Component {
   constructor(props) {
     super(props)
     this.onFocus = this.onFocus.bind(this)
-    this.onSetValue = this.onSetValue.bind(this)    
+    this.onInputValue = this.onInputValue.bind(this)    
+    this.onBackspaceValue = this.onBackspaceValue.bind(this)
   }
   onFocus(rowName) {
-    this.props.setActiveRow(this.props.matrix.name, rowName)
+    this.props.setActiveRow(this.props.matrixName, rowName)
   }
-  onSetValue(rowName, value) {
-    this.props.setValue(this.props.matrixName, rowName, value)
+  onInputValue(rowName, value) {
+    this.props.inputValue(this.props.matrixName, rowName, value)
+  }
+  onBackspaceValue(rowName) {
+    this.props.backspaceValue(this.props.matrixName, rowName)
   }
   render() {
     const values = [...Array(24).keys()].map(i => {
@@ -23,7 +27,7 @@ class Matrix extends React.Component {
       return <div key={i} className={className}></div>
     })
     const rows = this.props.matrix.get('rows').map((row, rowName) =>
-      <Row key={rowName} rowName={rowName} row={row} onFocus={this.onFocus} onSetValue={this.onSetValue} />
+      <Row key={rowName} rowName={rowName} row={row} onFocus={this.onFocus} onInputValue={this.onInputValue} onBackspaceValue={this.onBackspaceValue} />
     ).valueSeq()
     return (
       <div className="matrix">
@@ -47,8 +51,10 @@ export default connect(
     return {
       setActiveRow: (matrixName, rowName) =>
         dispatch({ type: 'setActiveRow', path: [matrixName, rowName] }),
-      setValue: (matrixName, rowName, value) =>
-        dispatch({ type: 'setValue', path: [matrixName, rowName, value] })
+      inputValue: (matrixName, rowName, value) =>
+        dispatch({ type: 'inputValue', path: [matrixName, rowName, value] }),
+      backspaceValue: (matrixName, rowName) =>
+        dispatch({ type: 'backspaceValue', path: [matrixName, rowName] })
     }
   }
 )(Matrix)
