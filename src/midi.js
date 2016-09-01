@@ -6,6 +6,8 @@ const Midi = {
 
 export default Midi;
 
+const WebMidi = require('webmidi')
+
 WebMidi.enable(function (e) {
 
   if (e) {

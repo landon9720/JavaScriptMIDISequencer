@@ -1,9 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-const notActive = 'rowValue'
-const active = 'rowValue activeCol'
-
 class Value extends React.Component {
   constructor(props) {
     super(props)
@@ -14,11 +11,11 @@ class Value extends React.Component {
   }
   render() {
     return (
-      <div 
-        className={(this.props.rowHasFocus && this.props.colIndex == this.props.activeCol) ? active : notActive} 
+      <td 
+        className={(this.props.rowHasFocus && this.props.colIndex == this.props.activeCol) ? 'activeCol' : ''} 
         onMouseDown={this.onMouseDown}>
-        {this.props.value === undefined ? "" : this.props.value}
-      </div>
+        {this.props.value === undefined ? "\u00a0" : this.props.value}
+      </td>
     )
   }
 }

@@ -86,10 +86,10 @@ class Row extends React.Component {
       return <Value key={i} colIndex={i} rowHasFocus={this.hasFocus} value={v} />
     })
     return (
-      <div className="matrixRow" ref="el" tabIndex="0" onKeyDown={this.onKeyDown} onFocus={this.onFocus}>
-        <div className="matrixRowName">{this.props.rowName}</div>
-        <div className="matrixRowValues">{rowValues}</div>
-      </div>
+      <tr className="matrixRow" ref="el" tabIndex="0" onKeyDown={this.onKeyDown} onFocus={this.onFocus}>
+        <td className="col0">{this.props.rowName}</td>
+        {rowValues}
+      </tr>
     );
   }
 }

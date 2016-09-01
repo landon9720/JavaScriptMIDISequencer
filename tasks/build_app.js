@@ -21,10 +21,10 @@ gulp.task('bundle', function () {
 });
 
 gulp.task('less', function () {
-    return gulp.src(srcDir.path('stylesheets/main.less'))
+    return gulp.src(srcDir.path('main.less'))
         .pipe(plumber())
         .pipe(less())
-        .pipe(gulp.dest(destDir.path('stylesheets')));
+        .pipe(gulp.dest(destDir.path('')));
 });
 
 gulp.task('environment', function () {

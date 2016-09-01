@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import Panel from './panel.js'
 
 class Tools extends React.Component {
   constructor(props) {
@@ -20,10 +21,7 @@ class Tools extends React.Component {
         break
     }
     return (
-      <div id="tools">
-        <button type="button" className="btn btn-info" onClick={this.onClick}>{currentCursorModeString}</button>
-        <span className="label label-default">{this.props.currentPositionIndex}</span>
-      </div>
+      <a href="#" className="btn btn-primary" onClick={this.onClick}>{currentCursorModeString}</a>
     )
   }
 }
@@ -31,7 +29,6 @@ class Tools extends React.Component {
 export default connect(
   store => {
     return {
-      currentPositionIndex: store.currentPositionIndex,
       cursorMode: store.cursorMode
     }
   },

@@ -1,0 +1,28 @@
+@import "node_modules/bootstrap/less/variables.less";
+@import "node_modules/bootstrap/less/bootstrap.less";
+@import "node_modules/bootswatch/cyborg/variables.less";
+@import "node_modules/bootswatch/cyborg/bootswatch.less";
+body {
+    -webkit-user-select: none;
+    cursor: pointer;
+    margin-top: 50px;
+}
+
+.matrix {
+    thead {
+        background-color: @body-bg;
+    }
+    tr:focus {
+        outline: 0;
+    }
+    tr:focus td.activeCol {
+        background-color: @brand-primary;
+    }
+    td {
+        width: (100% - 20%) / 24;
+        &.col0 {
+            width: 20%;
+        }
+        text-align: center;
+    }
+}

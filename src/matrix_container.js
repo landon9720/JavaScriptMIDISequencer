@@ -1,15 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
-
 import Matrix from './matrix.js'
 
 class MatrixContainer extends React.Component {
   render() {
     var matrixes = this.props.matrixes.map((matrix, matrixName) =>
-      <Matrix key={matrixName} matrixName={matrixName} matrix={this.props.matrixes.get(matrixName)} />
+      <Matrix key={matrixName} matrixName={matrixName} matrix={this.props.matrixes.get(matrixName) } />
     ).valueSeq()
     return (
-      <div id="matrixContainer">
+      <div>
         {matrixes}
       </div>
     )

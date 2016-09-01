@@ -11,7 +11,8 @@ const defaultState = {
   activeRow: null,
   activeColIndex: 0,
   cursorMode: 0,
-  matrixes: Immutable.OrderedMap({})
+  matrixes: Immutable.OrderedMap(),
+  stack: Immutable.List()
 }
 
 const stateMachine = (state = defaultState, action) => {
@@ -112,7 +113,12 @@ const loadedState = {
         value: Immutable.Map()
       })
     }),
-  })
+  }),
+  monad: {
+    monad: {
+      matrix: "notes_of_scale"
+    }
+  }
 }
 
 export default createStore(

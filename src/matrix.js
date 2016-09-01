@@ -23,20 +23,22 @@ class Matrix extends React.Component {
     const values = [...Array(24).keys()].map(i => {
       const className =
         i == this.props.currentPositionIndex ?
-          'value active' : 'value'
-      return <div key={i} className={className}></div>
+          'danger' : ''
+      return <th key={i} className={className}></th>
     })
     const rows = this.props.matrix.get('rows').map((row, rowName) =>
       <Row key={rowName} rowName={rowName} row={row} onFocus={this.onFocus} onInputValue={this.onInputValue} onBackspaceValue={this.onBackspaceValue} />
     ).valueSeq()
     return (
-      <div className="matrix">
-        <div className="matrixHeading">
-          <div className="matrixName">{this.props.matrixName}</div>
-          <div className="matrixTimeSeries">{values}</div>
-        </div>
-        <div className="matrixRowArea">{rows}</div>
-      </div>
+      <table className="table matrix">
+        <thead>
+          <tr>
+            <th className="col0">{this.props.matrixName}</th>
+            {values}
+          </tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </table>
     )
   }
 }
