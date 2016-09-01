@@ -10,21 +10,26 @@ class Value extends React.Component {
     this.props.click(this.props.colIndex)
   }
   render() {
+    const vstr = ! this.props.value ? "\u00a0" : ((this.props.negative ? '-' : '') + this.props.value)
     return (
-      <td 
-        className={(this.props.rowHasFocus && this.props.colIndex == this.props.activeCol) ? 'activeCol' : ''} 
+      <td
+        className={(this.props.rowHasFocus && this.props.colIndex == this.props.activeCol) ? 'activeCol' : ''}
         onMouseDown={this.onMouseDown}>
-        {this.props.value === undefined ? "\u00a0" : this.props.value}
+        {vstr}
       </td>
     )
   }
 }
 
 export default connect(
-  state => { return { 
-    activeCol: state.activeColIndex,
-  }},
-  dispatch => { return {
-    click: (colIndex) => { dispatch({ type: 'setActiveColIndex', newActiveColIndex: colIndex })  }
-  }}
+  state => {
+    return {
+      activeCol: state.activeColIndex,
+    }
+  },
+  dispatch => {
+    return {
+      click: colIndex => { dispatch({ type: 'setActiveColIndex', newActiveColIndex: colIndex }) }
+    }
+  }
 )(Value)

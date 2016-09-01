@@ -1,16 +1,30 @@
 @import "node_modules/bootstrap/less/variables.less";
 @import "node_modules/bootstrap/less/bootstrap.less";
+@import "node_modules/bootstrap/less/mixins.less";
 @import "node_modules/bootswatch/cyborg/variables.less";
 @import "node_modules/bootswatch/cyborg/bootswatch.less";
+// @import "node_modules/bootstrap-select/less/variables.less";
+// @import "node_modules/bootstrap-select/less/bootstrap-select.less";
+html {
+    // -webkit-filter: brightness(100%) contrast(95%) saturate(44%) hue-rotate(127deg)
+}
+
+select {
+    -webkit-filter: invert(1);
+}
+
 body {
     -webkit-user-select: none;
     cursor: pointer;
-    margin-top: 50px;
+    margin-top: 15px;
 }
 
 .matrix {
     thead {
         background-color: @body-bg;
+        .transport {
+            background-color: @brand-danger;
+        }
     }
     tr:focus {
         outline: 0;
@@ -25,4 +39,17 @@ body {
         }
         text-align: center;
     }
+}
+
+.panel-body {
+    background-color: @body-bg;
+}
+
+.monad ul {
+    margin: 0;
+    padding: 0 0 0 20px;
+    &.rootMonad {
+        padding: 0;
+    }
+    list-style: none;
 }

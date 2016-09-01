@@ -12,7 +12,8 @@ const defaultState = {
   activeColIndex: 0,
   cursorMode: 0,
   matrixes: Immutable.OrderedMap(),
-  stack: Immutable.List()
+  monad: Immutable.Map(),
+  activeMonadPath: null
 }
 
 const stateMachine = (state = defaultState, action) => {
@@ -51,6 +52,7 @@ const stateMachine = (state = defaultState, action) => {
         const matrixName = action.path[0]
         const rowName = action.path[1]
         const value = action.path[2]
+        const negative = action.path[3]
         const novalue = value === undefined
         var matrix = state.matrixes.get(matrixName)
         if (state.cursorMode > 0) {
@@ -64,7 +66,9 @@ const stateMachine = (state = defaultState, action) => {
           })
           matrix = matrix.set('rows', shiftedRows)
         }
-        matrix = matrix.setIn(["rows", rowName, state.activeColIndex], value)
+        matrix = novalue ?
+          matrix.deleteIn(["rows", rowName, state.activeColIndex]) :
+          matrix.setIn(["rows", rowName, state.activeColIndex], { v: value, negative: negative })
         return Object.assign({}, state, {
           matrixes: state.matrixes.set(matrixName, matrix)
         })
@@ -90,10 +94,39 @@ const stateMachine = (state = defaultState, action) => {
           matrixes: state.matrixes.set(matrixName, matrix)
         })
       })()
+    case "unselectAll":
+      return Object.assign({}, state, {
+        activeMatrix: null,
+        activeRow: null,
+        activeMonadPath: null
+      })
+    case "selectMonad":
+      return Object.assign({}, state, {
+        activeMonadPath: action.monadPath
+      })
+    case "setInputMatrix":
+      return Object.assign({}, state, {
+        monad: state.monad.mergeDeepIn(state.activeMonadPath, {
+          i: action.matrixName
+        })
+      })
+    case "setƒ":
+      const xPath = state.activeMonadPath.push("x")
+      const existingX = state.monad.getIn(xPath)
+      const newX = Object.assign({}, action.defaults, existingX, { ƒ: action.ƒ })
+      return Object.assign({}, state, { monad: state.monad.mergeDeepIn(xPath, newX) })
+    case "setOutputMidiChannel":
+      return Object.assign({}, state, {
+        monad: state.monad.mergeDeepIn(state.activeMonadPath, {
+          o: action.outputMidiChannel
+        })
+      })
     default:
       return state
   }
 }
+
+class MonadRecord extends Immutable.Record({}) { }
 
 const loadedState = {
   currentPositionIndex: 0,
@@ -102,32 +135,48 @@ const loadedState = {
   activeColIndex: 0,
   cursorMode: 0,
   matrixes: Immutable.OrderedMap({
-    scale: Immutable.OrderedMap({
+    major: Immutable.OrderedMap({
       rows: Immutable.OrderedMap({
         value: Immutable.Map()
-      })
+      }),
+      tLabel: "mask"
     }),
     notes_of_scale: Immutable.OrderedMap({
       rows: Immutable.OrderedMap({
-        duration: Immutable.Map(),
-        value: Immutable.Map()
-      })
+        value: Immutable.Map(),
+        duration: Immutable.Map()
+      }),
+      tLabel: "time"
     }),
   }),
-  monad: {
-    monad: {
-      matrix: "notes_of_scale"
-    }
-  }
+  monad: Immutable.fromJS({
+    i: "notes_of_scale",
+    x: {
+      ƒ: "scale",
+      with: {
+        i: "major",
+        x: {
+          ƒ: "identity"
+        }
+      }
+    },
+    o: 1
+  }),
+  activeMonadPath: null
 }
 
-export default createStore(
+const store = createStore(
   stateMachine,
   loadedState,
-  applyMiddleware(thunk, promise, createLogger({
-    collapsed: true,
-    stateTransformer: state => Object.assign({}, state, {
-      matrixes: state.matrixes.toJS()
-    })
-  }))
+  // applyMiddleware(thunk, promise,
+  //   createLogger(
+  //     {
+  //       collapsed: true,
+  //       actionTransformer: action => Immutable.fromJS(action).toJS(),
+  //       stateTransformer: state => Immutable.fromJS(state).toJS()
+  //     }
+  //   )
+  // )
 )
+
+export default store

@@ -1,6 +1,8 @@
+import Immutable from 'immutable'
+
 const Midi = {
   onPositionUpdate: () => { },
-  midi: {}, // time -> midi message map
+  midi: Immutable.Map(), // maps time to set of messages
   pos: 0
 };
 
@@ -17,21 +19,24 @@ WebMidi.enable(function (e) {
 
   const input = WebMidi.inputs[0];
   const output = WebMidi.outputs[0];
-  const output_channel = 1;
 
   input.addListener('clock', undefined, function (e) {
     Midi.pos++
     try {
-      const messages = Midi.midi[Midi.pos];
-      _(messages).each(function (message) {
-        if (message.on) {
-          output.playNote(message.note, output_channel, { velocity: message.attack });
-        } else {
-          output.stopNote(message.note, output_channel, { velocity: message.release });
-        }
-      })
+      const messages = Midi.midi.get(Midi.pos);
+      if (messages) {
+        messages.forEach(function (message) {
+          if (message.on) {
+            console.log("playNote", message)
+            output.playNote(message.note, message.output_channel, { velocity: message.velocity });
+          } else {
+            console.log("stopNote", message)
+            output.stopNote(message.note, message.output_channel, { velocity: message.velocity });
+          }
+        })
+      }
     } catch (ex) {
-      console.log(`Failed sending MIDI message with exception: ${ex}`);
+      console.error("Failed sending MIDI message with exception", ex)
     }
     Midi.onPositionUpdate(Midi.pos)
   });
