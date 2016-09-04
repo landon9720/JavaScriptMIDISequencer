@@ -19,7 +19,8 @@ body {
     margin-top: 15px;
 }
 
-.matrix {
+table.matrix {
+    table-layout: fixed;
     thead {
         background-color: @body-bg;
         .transport {
@@ -35,15 +36,12 @@ body {
     td {
         width: (100% - 20%) / 24;
         white-space: nowrap;
+        overflow: hidden;
         &.col0 {
             width: 20%;
         }
         text-align: center;
     }
-}
-
-.panel-body {
-    background-color: @body-bg;
 }
 
 .monad ul {

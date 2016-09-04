@@ -86,7 +86,7 @@ class MonadContainer extends React.Component {
             </div>
         }).bind(this)() : null
         return (
-            <Panel title="Monad" brand="success" className="monad">
+            <Panel brand="default" className="monad">
                 <div className="row">
                     <div className="col-lg-6">
                         <ul className="rootMonad">
@@ -109,7 +109,7 @@ class MonadContainer extends React.Component {
     }
     renderListing(m, path) {
         const labelClassName = path.equals(this.props.activeMonadPath) ?
-            "text-info" : ""
+            "text-danger" : ""
         const label = <a className={labelClassName} onClick={this.props.selectMonad.bind(this, path) }>{m.get("i") }</a>
         const children = m.has("x") ? this.renderListingX(m.get("x"), path.push("x")) : null
         return <li key={path}>{label}{children}</li>

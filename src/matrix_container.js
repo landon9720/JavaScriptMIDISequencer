@@ -11,9 +11,9 @@ class MatrixContainer extends React.Component {
       )
     }).valueSeq()
     return (
-      <Panel title="Matrix" brand="primary">
+      <div>
         {matrixes}
-      </Panel>
+      </div>
     )
   }
 }

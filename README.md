@@ -26,6 +26,7 @@ Screenshots
 -----------
 
 ![Screenshot 1](Screen Shot 2016-08-25 at 10.21.02 PM.png)
+![Screenshot 2](Screen Shot 2016-09-03 at 9.25.27 PM.png)
 
 Blah blah blah
 --------------
