@@ -52,7 +52,6 @@ const stateMachine = (state = defaultState, action) => {
         const matrixName = action.path[0]
         const rowName = action.path[1]
         const value = action.path[2]
-        const negative = action.path[3]
         const novalue = value === undefined
         var matrix = state.matrixes.get(matrixName)
         if (state.cursorMode > 0) {
@@ -68,7 +67,7 @@ const stateMachine = (state = defaultState, action) => {
         }
         matrix = novalue ?
           matrix.deleteIn(["rows", rowName, state.activeColIndex]) :
-          matrix.setIn(["rows", rowName, state.activeColIndex], { v: value, negative: negative })
+          matrix.setIn(["rows", rowName, state.activeColIndex], value)
         return Object.assign({}, state, {
           matrixes: state.matrixes.set(matrixName, matrix)
         })
@@ -168,15 +167,15 @@ const loadedState = {
 const store = createStore(
   stateMachine,
   loadedState,
-  // applyMiddleware(thunk, promise,
-  //   createLogger(
-  //     {
-  //       collapsed: true,
-  //       actionTransformer: action => Immutable.fromJS(action).toJS(),
-  //       stateTransformer: state => Immutable.fromJS(state).toJS()
-  //     }
-  //   )
-  // )
+  applyMiddleware(thunk, promise,
+    createLogger(
+      {
+        collapsed: true,
+        actionTransformer: action => Immutable.fromJS(action).toJS(),
+        stateTransformer: state => Immutable.fromJS(state).toJS()
+      }
+    )
+  )
 )
 
 export default store

@@ -53,9 +53,8 @@ class Row extends React.Component {
         break
       case ((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 65 && e.keyCode <= 90)):
         if (!e.altKey && !e.ctrlKey && !e.metaKey) {
-          const value = e.key
-          const negative = e.shiftKey
-          this.props.onInputValue(this.props.rowName, value, negative)
+          const value = (e.keyCode >= 65 ? (e.keyCode - 65 + 10) : (e.keyCode - 48)) * (e.shiftKey ? -1 : 1)
+          this.props.onInputValue(this.props.rowName, value)
           this.props.right()
         }
         break
@@ -81,10 +80,9 @@ class Row extends React.Component {
   } 
   render() {
     const rowValues = [...Array(24).keys()].map(i => {
-      const v = this.props.row.get(i)
-      const vstr = v ? v.v : null
-      const negative = v ? v.negative : null 
-      return <Value key={i} colIndex={i} rowHasFocus={this.hasFocus} value={vstr} negative={negative} />
+      var v = this.props.row.get(i)
+      if (v !== undefined) v = v.toString(36)
+      return <Value key={i} colIndex={i} rowHasFocus={this.hasFocus} value={v} />
     })
     return (
       <tr className="matrixRow" ref="el" tabIndex="0" onKeyDown={this.onKeyDown} onFocus={this.onFocus}>

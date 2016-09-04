@@ -24,9 +24,7 @@ export default function (state) {
 
 const matrixToSequence = matrix => {
     const matrixValues = matrix.get('rows').get('value').entrySeq()
-    const sequence = matrixValues.flatMap(([k, {v, negative}]) => {
-        const charCode = v.toUpperCase().charCodeAt(0)
-        var value = (charCode >= 65 ? charCode - 55 : charCode - 48) * (negative ? -1 : 1)
+    const sequence = matrixValues.flatMap(([k, value]) => {
         const duration = 1
         return Immutable.List([{
             t: k,

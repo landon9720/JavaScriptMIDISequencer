@@ -13,8 +13,8 @@ class Matrix extends React.Component {
   onFocus(rowName) {
     this.props.setActiveRow(this.props.matrixName, rowName)
   }
-  onInputValue(rowName, value, negative) {
-    this.props.inputValue(this.props.matrixName, rowName, value, negative)
+  onInputValue(rowName, value) {
+    this.props.inputValue(this.props.matrixName, rowName, value)
   }
   onBackspaceValue(rowName) {
     this.props.backspaceValue(this.props.matrixName, rowName)
@@ -52,7 +52,7 @@ export default connect(
       setActiveRow: (matrixName, rowName) =>
         dispatch({ type: 'setActiveRow', path: [matrixName, rowName] }),
       inputValue: (matrixName, rowName, value, negative) =>
-        dispatch({ type: 'inputValue', path: [matrixName, rowName, value, negative] }),
+        dispatch({ type: 'inputValue', path: [matrixName, rowName, value] }),
       backspaceValue: (matrixName, rowName) =>
         dispatch({ type: 'backspaceValue', path: [matrixName, rowName] })
     }

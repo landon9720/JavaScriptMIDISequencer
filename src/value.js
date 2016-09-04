@@ -10,7 +10,7 @@ class Value extends React.Component {
     this.props.click(this.props.colIndex)
   }
   render() {
-    const vstr = ! this.props.value ? "\u00a0" : ((this.props.negative ? '-' : '') + this.props.value)
+    const vstr = ! this.props.value ? "\u00a0" : this.props.value
     return (
       <td
         className={(this.props.rowHasFocus && this.props.colIndex == this.props.activeCol) ? 'activeCol' : ''}

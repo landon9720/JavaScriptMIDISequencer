@@ -19,6 +19,8 @@ References
 * [ImmutableJS]()
 * [Electron]() via [electron-boilerplate]()
 * [ES6]() via [Babel]()
+* [WebMidi](https://github.com/cotejp/webmidi)
+* [MIDI](https://www.midi.org/specifications/item/table-2-expanded-messages-list-status-bytes)
 
 Screenshots
 -----------
