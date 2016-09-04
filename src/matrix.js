@@ -28,10 +28,10 @@ class Matrix extends React.Component {
       <Row key={rowName} rowName={rowName} row={row} onFocus={this.onFocus} onInputValue={this.onInputValue} onBackspaceValue={this.onBackspaceValue} />
     ).valueSeq()
     return (
-      <table className="table">
+      <table className="table matrix">
         <thead>
           <tr>
-            <td className="col0">{this.props.matrix.get("tLabel")}</td>
+            <td className="col0">{this.props.matrixName}</td>
             {values}
           </tr>
         </thead>

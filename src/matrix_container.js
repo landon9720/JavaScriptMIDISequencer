@@ -7,15 +7,13 @@ class MatrixContainer extends React.Component {
   render() {
     var matrixes = this.props.matrixes.map((matrix, matrixName) => {
       return (
-        <Panel key={matrixName} title={matrixName} className="matrix" brand="primary">
-          <Matrix matrixName={matrixName} matrix={this.props.matrixes.get(matrixName)} />
-        </Panel>
+        <Matrix key={matrixName} matrixName={matrixName} matrix={this.props.matrixes.get(matrixName) } />
       )
     }).valueSeq()
     return (
-      <div>
+      <Panel title="Matrix" brand="primary">
         {matrixes}
-      </div>
+      </Panel>
     )
   }
 }

@@ -137,15 +137,13 @@ const loadedState = {
     major: Immutable.OrderedMap({
       rows: Immutable.OrderedMap({
         value: Immutable.Map()
-      }),
-      tLabel: "mask"
+      })
     }),
     notes_of_scale: Immutable.OrderedMap({
       rows: Immutable.OrderedMap({
         value: Immutable.Map(),
         duration: Immutable.Map()
-      }),
-      tLabel: "time"
+      })
     }),
   }),
   monad: Immutable.fromJS({
