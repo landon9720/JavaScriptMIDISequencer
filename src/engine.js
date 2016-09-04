@@ -23,9 +23,11 @@ export default function (state) {
 }
 
 const matrixToSequence = matrix => {
-    const matrixValues = matrix.get('rows').get('value').entrySeq()
-    const sequence = matrixValues.flatMap(([k, value]) => {
-        const duration = 1
+    const rows = matrix.get('rows')
+    const valueRow = rows.get('value', Immutable.Map())
+    const durationRow = rows.get('duration', Immutable.Map())
+    const sequence = valueRow.entrySeq().flatMap(([k, value]) => {
+        const duration = durationRow.get(k, 1)
         return Immutable.List([{
             t: k,
             value: value,
