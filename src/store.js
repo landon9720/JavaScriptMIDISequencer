@@ -145,6 +145,12 @@ const loadedState = {
         duration: Immutable.Map()
       })
     }),
+    chromatic_notes: Immutable.OrderedMap({
+      rows: Immutable.OrderedMap({
+        value: Immutable.Map(),
+        duration: Immutable.Map()
+      })
+    }),
   }),
   monad: Immutable.fromJS({
     i: "notes_of_scale",

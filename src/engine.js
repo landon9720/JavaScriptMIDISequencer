@@ -8,9 +8,8 @@ var rootMonad = null
 export default function (state) {
     matrixes = state.matrixes
     rootMonad = state.monad
+    Midi.midi = Immutable.Map()
     const sequence = monadToSequence(rootMonad)
-    const midi = sequenceToMidi(sequence)
-    Midi.midi = midi
 }
 
 const monadToSequence = monad => {
@@ -20,6 +19,11 @@ const monadToSequence = monad => {
     const ƒParams = monad.get('x')
     const ƒKey = ƒParams.get('ƒ')
     const resultSequence = ƒdb[ƒKey](sequence, ƒParams)
+    if (monad.has('o')) {
+        const midiChannel = monad.get('o')
+        const midi = sequenceToMidi(Midi.midi, sequence, midiChannel)
+        Midi.midi = midi
+    }
     return resultSequence
 }
 
@@ -110,7 +114,8 @@ const indexSequence = sequence => {
 
 const midiRoot = 60
 
-const sequenceToMidi = sequence => {
+// midi is a map of t to the set of messages at t
+const sequenceToMidi = (midiTimeMessagesMap, sequence, midiChannel) => {
     const midi = sequence.reduce((accumulator, event) => {
         const start = event.t + 1
         const end = start + event.duration
@@ -119,20 +124,20 @@ const sequenceToMidi = sequence => {
         var endMessages = accumulator.get(end, Immutable.Set())
         startMessages = startMessages.add({
             on: true,
-            output_channel: 1,
+            output_channel: midiChannel,
             note: midiRoot + event.value,
             velocity: 100
         })
         endMessages = endMessages.add({
             on: false,
-            output_channel: 1,
+            output_channel: midiChannel,
             note: midiRoot + event.value,
             velocity: 100
         })
         a = a.set(start, startMessages)
         a = a.set(end, endMessages)
         return a
-    }, Immutable.Map())
+    }, midiTimeMessagesMap)
     console.log("midi", midi.toJS())
     return midi
 }
