@@ -125,8 +125,6 @@ const stateMachine = (state = defaultState, action) => {
   }
 }
 
-class MonadRecord extends Immutable.Record({}) { }
-
 const loadedState = {
   currentPositionIndex: 0,
   activeMatrix: null,
@@ -153,17 +151,11 @@ const loadedState = {
     }),
   }),
   monad: Immutable.fromJS({
-    i: "notes_of_scale",
     x: {
-      ƒ: "scale",
-      with: {
-        i: "major",
-        x: {
-          ƒ: "identity"
-        }
-      }
-    },
-    o: 1
+      ƒ: "parallel",
+      monad1: { i: "notes_of_scale", x: { ƒ: "scale", with: { i: "major", x: { ƒ: "identity" } } }, o: 1 },
+      monad2: { i: "chromatic_notes", x: { ƒ: "identity" }, o: 2 }
+    }
   }),
   activeMonadPath: null
 }

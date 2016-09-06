@@ -6,23 +6,28 @@ import Immutable from 'immutable'
 class MonadContainer extends React.Component {
     constructor(props) {
         super(props)
+        const IdentityMonad = {
+            i: this.props.matrixNames.first(),
+            x: { ƒ: "identity" }
+        }
         this.ƒdb = Immutable.fromJS({
             identity: {
             },
             scale: {
                 with: {
-                    form: (x, key) => {
-                        return null //<div key={key}>Hello, world 2</div>
-                    },
-                    default: () => {
-                        return {
-                            i: this.props.matrixNames.first(),
-                            x: {
-                                ƒ: "identity"
-                            }
-                        }
-                    }
+                    form: (x, key) => null,
+                    default: () => IdentityMonad
                 }
+            },
+            parallel: {
+                monad1: {
+                    form: (x, key) => null,
+                    default: () => IdentityMonad
+                },
+                monad2: {
+                    form: (x, key) => null,
+                    default: () => IdentityMonad
+                },
             }
         })
         this.onInputMatrixChange = this.onInputMatrixChange.bind(this)
@@ -110,7 +115,7 @@ class MonadContainer extends React.Component {
     renderListing(m, path) {
         const labelClassName = path.equals(this.props.activeMonadPath) ?
             "text-danger" : ""
-        const label = <a className={labelClassName} onClick={this.props.selectMonad.bind(this, path) }>{m.get("i") }</a>
+        const label = <a className={labelClassName} onClick={this.props.selectMonad.bind(this, path) }>{m.get("i", "ƒ") }</a>
         const children = m.has("x") ? this.renderListingX(m.get("x"), path.push("x")) : null
         return <li key={path}>{label}{children}</li>
     }

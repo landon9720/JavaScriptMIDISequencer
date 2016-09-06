@@ -13,15 +13,20 @@ export default function (state) {
 }
 
 const monadToSequence = monad => {
-    const inputMatrixName = monad.get('i')
-    const matrix = matrixes.get(inputMatrixName)
-    const sequence = matrixToSequence(matrix)
+    var sequence
+    if (monad.has('i')) {
+        const inputMatrixName = monad.get('i')
+        const matrix = matrixes.get(inputMatrixName)
+        sequence = matrixToSequence(matrix)
+    } else {
+        sequence = EmptySequence
+    }
     const ƒParams = monad.get('x')
     const ƒKey = ƒParams.get('ƒ')
     const resultSequence = ƒdb[ƒKey](sequence, ƒParams)
     if (monad.has('o')) {
         const midiChannel = monad.get('o')
-        const midi = sequenceToMidi(Midi.midi, sequence, midiChannel)
+        const midi = sequenceToMidi(Midi.midi, resultSequence, midiChannel)
         Midi.midi = midi
     }
     return resultSequence
@@ -83,9 +88,19 @@ const scaleƒ = (input, parameters) => {
     return result
 }
 
+const parallelƒ = (input, parameters) => {
+    const monad1 = parameters.get('monad1')
+    const monad2 = parameters.get('monad2')
+    var result = input
+    if (monad1) result = result.concat(monadToSequence(monad1))
+    if (monad2) result = result.concat(monadToSequence(monad2))
+    return result
+}
+
 const ƒdb = {
     identity: identityƒ,
-    scale: scaleƒ
+    scale: scaleƒ,
+    parallel: parallelƒ,
 }
 
 // a sequence is an immutable list of events
