@@ -64,6 +64,7 @@ class MonadContainer extends React.Component {
                 <div className="form-group">
                     <label>in</label>
                     <select className="form-control" value={activeMonad.get("i") } onChange={this.onInputMatrixChange}>
+                        <option key={null} value={null}>ƒ</option>
                         {this.props.matrixNames.map(matrixName =>
                             <option key={matrixName} value={matrixName}>{matrixName}</option>
                         ).valueSeq() }
