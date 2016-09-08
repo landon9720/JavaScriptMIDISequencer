@@ -38,7 +38,7 @@ class MonadContainer extends React.Component {
         this.props.selectMonad(path)
     }
     onInputMatrixChange(e) {
-        this.props.setInputMatrix(e.target.value)
+        this.props.setInputMatrix(e.target.value != 'none' ? e.target.value : null)
     }
     onƒChange(e) {
         const ƒ = e.target.value
@@ -48,7 +48,7 @@ class MonadContainer extends React.Component {
         this.props.setƒ(ƒ, defaults)
     }
     onOutputMidiChannelChange(e) {
-        this.props.setOutputMidiChannel(e.target.value != null ? e.target.value : null)
+        this.props.setOutputMidiChannel(e.target.value != 'none' ? Number(e.target.value) : null)
     }
     render() {
         const activeMonad = this.props.activeMonad
@@ -64,7 +64,7 @@ class MonadContainer extends React.Component {
                 <div className="form-group">
                     <label>in</label>
                     <select className="form-control" value={activeMonad.get("i") } onChange={this.onInputMatrixChange}>
-                        <option key={null} value={null}>ƒ</option>
+                        <option key="{null}" value="none">ƒ</option>
                         {this.props.matrixNames.map(matrixName =>
                             <option key={matrixName} value={matrixName}>{matrixName}</option>
                         ).valueSeq() }
@@ -81,7 +81,7 @@ class MonadContainer extends React.Component {
                 <div className="form-group">
                     <label>out</label>
                     <select className="form-control" value={activeMonad.get('o', 'none') } onChange={this.onOutputMidiChannelChange}>
-                        <option key="none" value="none">None</option>
+                        <option key="{null}" value="none">None</option>
                         {[...Array(16).keys()].map(i => {
                             const channel = i + 1
                             return <option key={channel} value={channel}>MIDI Channel {channel}</option>

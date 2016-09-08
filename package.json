@@ -50,11 +50,13 @@
     "mocha": "^3.0.2",
     "rollup": "^0.34.7",
     "rollup-plugin-babel": "^2.6.1",
+    "rollup-plugin-typescript": "^0.8.1",
     "source-map-support": "^0.4.2",
     "spectron": "^3.3.0",
     "yargs": "^4.2.0"
   },
   "dependencies": {
+    "babel-plugin-transform-strict-mode": "^6.11.3",
     "bootstrap": "^3.3.7",
     "bootswatch": "^3.3.7"
   }

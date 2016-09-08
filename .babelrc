@@ -1,1 +1,8 @@
- { "presets": ["react"] }
+{
+    "presets": [
+        "react"
+    ],
+    "plugins": [
+        "transform-strict-mode"
+    ]
+}

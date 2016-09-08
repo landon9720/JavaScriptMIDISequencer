@@ -105,9 +105,9 @@ const stateMachine = (state = defaultState, action) => {
       })
     case "setInputMatrix":
       return Object.assign({}, state, {
-        monad: state.monad.mergeDeepIn(state.activeMonadPath, {
-          i: action.matrixName
-        })
+        monad: action.matrixName ? 
+          state.monad.setIn(state.activeMonadPath.push('i'), action.matrixName) :
+          state.monad.deleteIn(state.activeMonadPath.push('i'))
       })
     case "setƒ":
       const xPath = state.activeMonadPath.push("x")
@@ -116,9 +116,9 @@ const stateMachine = (state = defaultState, action) => {
       return Object.assign({}, state, { monad: state.monad.mergeDeepIn(xPath, newX) })
     case "setOutputMidiChannel":
       return Object.assign({}, state, {
-        monad: state.monad.mergeDeepIn(state.activeMonadPath, {
-          o: action.outputMidiChannel
-        })
+        monad: action.outputMidiChannel ?
+          state.monad.setIn(state.activeMonadPath.push('o'), action.outputMidiChannel) :
+          state.monad.deleteIn(state.activeMonadPath.push('o'))
       })
     default:
       return state

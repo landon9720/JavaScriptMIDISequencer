@@ -21,23 +21,23 @@ Midi.onPositionUpdate = positionIndex => {
   store.dispatch({ type: 'setPositionIndex', newPositionIndex: positionIndex - 1 })
 }
 
-const waitTime = 200
-var timer = null
-var matrixes0
-var monad0
+// const waitTime = 200
+// var timer = null
+// var matrixes0
+// var monad0
 store.subscribe(() => {
-  const state = store.getState()
-  if (!state.matrixes.equals(matrixes0) || !state.monad.equals(monad0)) {
-    matrixes0 = state.matrixes
-    monad0 = state.monad
-    if (timer) {
-      return
-    }
-    timer = setTimeout(() => {
+  // const state = store.getState()
+  // if (!state.matrixes.equals(matrixes0) || !state.monad.equals(monad0)) {
+  //   matrixes0 = state.matrixes
+  //   monad0 = state.monad
+  //   if (timer) {
+  //     return
+  //   }
+  //   timer = setTimeout(() => {
       engage(store.getState())
-      timer = null
-    }, waitTime)
-  }
+  //     timer = null
+  //   }, waitTime)
+  // }
 })
 
 class App_ extends React.Component {
