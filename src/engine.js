@@ -59,16 +59,16 @@ const sequenceToScale = sequence => {
 const applyScaleToSequence = (sequence, scale) => {
     return sequence.map(e => {
         var rank = e.value
-        // var octave = value.octave
+        var octave = e.octave
         while (rank < 0) {
             rank += scale.size
-            // octave -= 1
+            octave -= 1
         }
         while (rank >= scale.size) {
             rank -= scale.size
-            // octave += 1
+            octave += 1
         }
-        return Object.assign({}, e, { value: scale.get(rank) })
+        return Object.assign({}, e, { value: scale.get(rank), octave: octave })
     })
 }
 
@@ -104,18 +104,24 @@ const ƒdb = {
 }
 
 // a sequence is an immutable list of events
-// an event is a t, value, duration
+// an event is a t, value, octave, accidental, duration
 const EmptySequence = Immutable.List()
 
 const matrixToSequence = matrix => {
     const rows = matrix.get('rows')
     const valueRow = rows.get('value', Immutable.Map())
+    const octaveRow = rows.get('octave', Immutable.Map())
+    const accidentalRow = rows.get('accidental', Immutable.Map())
     const durationRow = rows.get('duration', Immutable.Map())
     const sequence = valueRow.entrySeq().flatMap(([k, value]) => {
+        const octave = octaveRow.get(k, 0)
+        const accidental = accidentalRow.get(k, 0)
         const duration = durationRow.get(k, 1)
         return Immutable.List([{
             t: k,
             value: value,
+            octave: octave,
+            accidental: accidental,
             duration: duration
         }])
     })
@@ -140,13 +146,13 @@ const sequenceToMidi = (midiTimeMessagesMap, sequence, midiChannel) => {
         startMessages = startMessages.add({
             on: true,
             output_channel: midiChannel,
-            note: midiRoot + event.value,
+            note: midiRoot + event.octave * 12 + event.value + event.accidental,
             velocity: 100
         })
         endMessages = endMessages.add({
             on: false,
             output_channel: midiChannel,
-            note: midiRoot + event.value,
+            note: midiRoot + event.octave * 12 + event.value,
             velocity: 100
         })
         a = a.set(start, startMessages)

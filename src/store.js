@@ -140,12 +140,16 @@ const loadedState = {
     notes_of_scale: Immutable.OrderedMap({
       rows: Immutable.OrderedMap({
         value: Immutable.Map(),
+        octave: Immutable.Map(),
+        accidental: Immutable.Map(),
         duration: Immutable.Map()
       })
     }),
     chromatic_notes: Immutable.OrderedMap({
       rows: Immutable.OrderedMap({
         value: Immutable.Map(),
+        octave: Immutable.Map(),
+        accidental: Immutable.Map(),
         duration: Immutable.Map()
       })
     }),
