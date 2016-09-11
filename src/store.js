@@ -5,6 +5,25 @@ import thunk from 'redux-thunk'
 import promise from 'redux-promise'
 import createLogger from 'redux-logger'
 
+export const MatrixKindNotes = {
+  cols: 24
+} // a type
+export const MatrixKindScale = {
+  cols: 12
+} // a type
+export const MatrixKindMonad = {
+  cols: 6
+} // a type
+
+export const stringToKind = s => {
+  if (s == 'notes') return MatrixKindNotes
+  if (s == 'scale') return MatrixKindScale
+  if (s == 'monad') return MatrixKindMonad
+  throw s
+}
+
+// String.prototype.stringToKind = stringToKind
+
 const defaultState = {
   currentPositionIndex: 0,
   activeMatrix: null,
@@ -12,8 +31,6 @@ const defaultState = {
   activeColIndex: 0,
   cursorMode: 0,
   matrixes: Immutable.OrderedMap(),
-  monad: Immutable.Map(),
-  activeMonadPath: null
 }
 
 const stateMachine = (state = defaultState, action) => {
@@ -28,7 +45,7 @@ const stateMachine = (state = defaultState, action) => {
       })
     case "incrActiveColIndex":
       return Object.assign({}, state, {
-        activeColIndex: Math.min(state.activeColIndex + 1, 23)
+        activeColIndex: Math.min(state.activeColIndex + 1, stringToKind(state.matrixes.get(state.activeMatrix).get('kind')).cols - 1)
       })
     case "decrActiveColIndex":
       return Object.assign({}, state, {
@@ -97,28 +114,6 @@ const stateMachine = (state = defaultState, action) => {
       return Object.assign({}, state, {
         activeMatrix: null,
         activeRow: null,
-        activeMonadPath: null
-      })
-    case "selectMonad":
-      return Object.assign({}, state, {
-        activeMonadPath: action.monadPath
-      })
-    case "setInputMatrix":
-      return Object.assign({}, state, {
-        monad: action.matrixName ? 
-          state.monad.setIn(state.activeMonadPath.push('i'), action.matrixName) :
-          state.monad.deleteIn(state.activeMonadPath.push('i'))
-      })
-    case "setƒ":
-      const xPath = state.activeMonadPath.push("x")
-      const existingX = state.monad.getIn(xPath)
-      const newX = Object.assign({}, action.defaults, existingX, { ƒ: action.ƒ })
-      return Object.assign({}, state, { monad: state.monad.mergeDeepIn(xPath, newX) })
-    case "setOutputMidiChannel":
-      return Object.assign({}, state, {
-        monad: action.outputMidiChannel ?
-          state.monad.setIn(state.activeMonadPath.push('o'), action.outputMidiChannel) :
-          state.monad.deleteIn(state.activeMonadPath.push('o'))
       })
     default:
       return state
@@ -132,50 +127,53 @@ const loadedState = {
   activeColIndex: 0,
   cursorMode: 0,
   matrixes: Immutable.OrderedMap({
+    chromatic_notes: Immutable.OrderedMap({
+      kind: 'notes',
+      rows: Immutable.OrderedMap({
+        value: Immutable.Map(),
+        octave: Immutable.Map(),
+        accidental: Immutable.Map(),
+        duration: Immutable.Map()
+      })
+    }),
+    notes_of_scale: Immutable.OrderedMap({
+      kind: 'notes',
+      rows: Immutable.OrderedMap({
+        value: Immutable.Map(),
+        octave: Immutable.Map(),
+        accidental: Immutable.Map(),
+        duration: Immutable.Map()
+      })
+    }),
     major: Immutable.OrderedMap({
+      kind: 'scale',
       rows: Immutable.OrderedMap({
         value: Immutable.Map()
       })
     }),
-    notes_of_scale: Immutable.OrderedMap({
+    monads: Immutable.OrderedMap({
+      kind: 'monad',
       rows: Immutable.OrderedMap({
-        value: Immutable.Map(),
-        octave: Immutable.Map(),
-        accidental: Immutable.Map(),
-        duration: Immutable.Map()
-      })
-    }),
-    chromatic_notes: Immutable.OrderedMap({
-      rows: Immutable.OrderedMap({
-        value: Immutable.Map(),
-        octave: Immutable.Map(),
-        accidental: Immutable.Map(),
-        duration: Immutable.Map()
+        I: Immutable.Map(),
+        II: Immutable.Map(),
+        III: Immutable.Map(),
+        IV: Immutable.Map()
       })
     }),
   }),
-  monad: Immutable.fromJS({
-    x: {
-      ƒ: "parallel",
-      monad1: { i: "notes_of_scale", x: { ƒ: "scale", with: { i: "major", x: { ƒ: "identity" } } }, o: 1 },
-      monad2: { i: "chromatic_notes", x: { ƒ: "identity" }, o: 2 }
-    }
-  }),
-  activeMonadPath: null
 }
 
-const store = createStore(
+export default createStore(
   stateMachine,
   loadedState,
-  applyMiddleware(thunk, promise,
-    createLogger(
-      {
-        collapsed: true,
-        actionTransformer: action => Immutable.fromJS(action).toJS(),
-        stateTransformer: state => Immutable.fromJS(state).toJS()
-      }
-    )
-  )
+  // applyMiddleware(thunk, promise,
+  //   createLogger(
+  //     {
+  //       collapsed: true,
+  //       actionTransformer: action => Immutable.fromJS(action).toJS(),
+  //       stateTransformer: state => Immutable.fromJS(state).toJS()
+  //     }
+  //   )
+  // )
 )
 
-export default store

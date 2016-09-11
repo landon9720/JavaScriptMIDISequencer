@@ -79,7 +79,7 @@ class Row extends React.Component {
     this.props.onFocus(this.props.rowName)
   } 
   render() {
-    const rowValues = [...Array(24).keys()].map(i => {
+    const rowValues = [...Array(this.props.cols).keys()].map(i => {
       var v = this.props.row.get(i)
       if (v !== undefined) v = v.toString(36)
       return <Value key={i} colIndex={i} rowHasFocus={this.hasFocus} value={v} />
@@ -95,7 +95,7 @@ class Row extends React.Component {
 
 export default connect(
   state => { return { 
-    activeColIndex: state.activeColIndex 
+    activeColIndex: state.activeColIndex
   }},
   dispatch => { return {
     left: () => dispatch({'type': 'decrActiveColIndex'}),
