@@ -17,8 +17,9 @@ Midi.onPositionUpdate = positionIndex => {
 }
 
 store.subscribe(() => {
-      engage(store.getState())
+      // engage(store.getState())
 })
+
 class App_ extends React.Component {
   render() {
     return <div onMouseDown={this.props.unselectAll}>{this.props.children}</div>

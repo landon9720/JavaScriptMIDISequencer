@@ -34,6 +34,9 @@ const defaultState = {
 }
 
 const stateMachine = (state = defaultState, action) => {
+  const kind = state.activeMatrix ?
+    stringToKind(state.matrixes.get(state.activeMatrix).get('kind')) :
+    null
   switch (action.type) {
     case "setPositionIndex":
       return Object.assign({}, state, {
@@ -45,7 +48,7 @@ const stateMachine = (state = defaultState, action) => {
       })
     case "incrActiveColIndex":
       return Object.assign({}, state, {
-        activeColIndex: Math.min(state.activeColIndex + 1, stringToKind(state.matrixes.get(state.activeMatrix).get('kind')).cols - 1)
+        activeColIndex: Math.min(state.activeColIndex + 1, kind.cols - 1)
       })
     case "decrActiveColIndex":
       return Object.assign({}, state, {
@@ -57,11 +60,20 @@ const stateMachine = (state = defaultState, action) => {
       })
     case "setActiveRow":
       return (function () {
-        const matrixName = action.path[0]
-        const rowName = action.path[1]
+        const m = action.path[0]
+        const r = action.path[1]
+        var i = state.activeColIndex
+        if (state.activeMatrix && m && state.activeMatrix != m) {
+          const cols = stringToKind(state.matrixes.get(m).get('kind')).cols
+          if (cols != kind.cols) {
+            const ratio = cols / kind.cols 
+            i = Math.floor(i * ratio)
+          }
+        }
         return Object.assign({}, state, {
-          activeMatrix: matrixName,
-          activeRow: rowName
+          activeMatrix: m,
+          activeRow: r,
+          activeColIndex: i
         })
       })()
     case "inputValue":
