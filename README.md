@@ -5,11 +5,6 @@ What is this?
 2. A virtual instrument based on monad transformations on sequences of values
 3. A musical instrument for people who love spreadsheets
 
-To-do
------
-
-A very long list, but we'll get there.
-
 References
 ----------
 
@@ -25,53 +20,5 @@ References
 Screenshots
 -----------
 
-![Screenshot 1](Screen Shot 2016-08-25 at 10.21.02 PM.png)
-![Screenshot 2](Screen Shot 2016-09-03 at 9.25.27 PM.png)
-
-Blah blah blah
---------------
-
-* A
-  * Either[NameOfMatrix, A]
-  * Optional[B]
-  * Optional[C]
-
-* B
-  * (A, parameters) => A
-
-    0. identity (default)
-       * none
-    1. tempo
-       * multiplier: fraction
-    2. transpose
-       * offset: int
-    3. loop
-       * times: int
-    4. this then that
-       * m: M
-    5. this with that
-       * m: M
-    6. apply scale
-       * m: M
-    7. go sub
-       * m: M
-    8. fork
-       * m: M
-    9. abc
-       * abc: M
-       * scale: M
-
-* C
-  * Optional[(MidiDevice, MidiChannel)]
-
-Blah blah blah cont.
---------------------
-
-A monad is represented as a matrix row.
-Monads have names w/ default series I, II, III, IV, etc
-Each value is:
-1. Input: note matrix, or a monad
-2..n. Transform with parameters; monads are referenced by name; how parameters? 
-  dialog?
-  slide out panel? 
-n+1. Output: midi channel, or none
+![Screenshot 1](https://github.com/landon9720/JavaScriptMIDISequencer/blob/master/Screen%20Shot%202016-08-25%20at%2010.21.02%20PM.png)
+![Screenshot 2](https://github.com/landon9720/JavaScriptMIDISequencer/blob/master/Screen%20Shot%202016-09-03%20at%209.25.27%20PM.png)
